@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Comparison: Apple vs Amazon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "brand-purple": "#8B5CF6",
+              "stock-aapl": "#A855F7",
+              "stock-amzn": "#EC4899",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .chart-container {
+        animation: fadeIn 0.6s ease-in-out;
+      }
+      .hover-lift {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col font-sans antialiased">
+
+    <header class="bg-white shadow sticky top-0 z-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <div class="flex items-center space-x-4">
+          <a href="/home" class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span class="ml-2 text-xl font-bold text-gray-800">Pearler</span>
+          </a>
+        </div>
+
+        <nav class="hidden md:flex space-x-6">
+          <a href="/home" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Home</a>
+          <a href="/products" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Products</a>
+          <a href="/learn" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Learn</a>
+          <a href="/about-us" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">About</a>
+          <a href="/pricing" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Pricing</a>
+        </nav>
+
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="/login" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Log In</a>
+          <a href="/signup" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors duration-200">Sign Up</a>
+        </div>
+
+        <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-gray-900 focus:outline-none" aria-label="Toggle menu" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="mobile-menu" class="md:hidden hidden px-4 pb-4 space-y-2 bg-white shadow-md">
+        <a href="/home" class="block text-gray-600 hover:text-blue-600 py-2 transition-colors duration-200">Home</a>
+        <a href="/products" class="block text-gray-600 hover:text-blue-600 py-2 transition-colors duration-200">Products</a>
+        <a href="/learn" class="block text-gray-600 hover:text-blue-600 py-2 transition-colors duration-200">Learn</a>
+        <a href="/about-us" class="block text-gray-600 hover:text-blue-600 py-2 transition-colors duration-200">About</a>
+        <a href="/pricing" class="block text-gray-600 hover:text-blue-600 py-2 transition-colors duration-200">Pricing</a>
+        <a href="/login" class="block text-gray-600 hover:text-blue-600 py-2 transition-colors duration-200">Log In</a>
+        <a href="/signup" class="block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center mt-2 transition-colors duration-200">Sign Up</a>
+      </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 space-y-16">
+
+      <section class="text-center">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
+          Compare <span class="text-stock-aapl">AAPL</span> vs.
+          <span class="text-stock-amzn">AMZN</span>
+        </h1>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Explore a side-by-side comparison of Apple and Amazon shares trading on the US market, directly available through Pearler.
+        </p>
+      </section>
+
+      <section>
+        <div class="flex flex-col lg:flex-row lg:items-stretch lg:justify-between gap-8">
+          <div class="bg-white rounded-lg shadow flex-1 border-l-4 border-stock-aapl p-6 flex flex-col hover-lift">
+            <input
+              type="text"
+              value="AAPL"
+              placeholder="Search ticker..."
+              class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+            />
+            <div class="flex items-center space-x-4 mb-4 flex-grow">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
+                alt="AAPL logo"
+                class="h-12 w-12 flex-shrink-0"
+              />
+              <div>
+                <a
+                  href="https://pearler.com/share/US/AAPL"
+                  target="_blank" rel="noopener noreferrer"
+                  class="font-semibold text-gray-800 block hover:text-stock-aapl transition-colors duration-200"
+                  >Apple, Inc.</a
+                >
+                <p class="text-sm text-gray-500">AAPL (US Market)</p>
+              </div>
+            </div>
+            <a
+              href="/transact/buy/US.AAPL"
+              class="mt-auto inline-block bg-teal-500 text-white px-6 py-2 rounded hover:bg-teal-600 w-full text-center transition-colors duration-200"
+              >Buy AAPL</a
+            >
+          </div>
+
+          <div class="bg-white rounded-lg shadow flex-1 border-l-4 lg:border-l-0 lg:border-r-4 border-stock-amzn p-6 flex flex-col hover-lift">
+             <input
+              type="text"
+              value="AMZN"
+              placeholder="Search ticker..."
+              class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent lg:text-right"
+            />
+             <div class="flex flex-row-reverse lg:flex-row items-center lg:justify-end w-full space-x-4 space-x-reverse lg:space-x-4 lg:space-x-reverse-none mb-4 flex-grow">
+              <img
+                src="https://logo.clearbit.com/amazon.com"
+                alt="AMZN logo"
+                class="h-12 w-12 object-contain flex-shrink-0"
+              />
+              <div class="flex-grow lg:flex-grow-0 text-left lg:text-right">
+                <a
+                  href="https://pearler.com/share/US/AMZN"
+                   target="_blank" rel="noopener noreferrer"
+                  class="font-semibold text-gray-800 block hover:text-stock-amzn transition-colors duration-200"
+                  >Amazon.com Inc.</a
+                >
+                <p class="text-sm text-gray-500">AMZN (US Market)</p>
+              </div>
+            </div>
+            <a
+              href="/transact/buy/US.AMZN"
+              class="mt-auto inline-block bg-teal-500 text-white px-6 py-2 rounded hover:bg-teal-600 w-full text-center transition-colors duration-200"
+              >Buy AMZN</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Overview</h2>
+        <p class="text-gray-600 text-base leading-relaxed">
+          Choosing between tech giants like Apple (AAPL) and Amazon (AMZN) involves looking at their past performance, core business strengths, and potential risks. Both are dominant forces but operate with different models and growth drivers. The visualisations and data below aim to clarify some key differences to aid your investment considerations.
+        </p>
+      </section>
+
+      <section class="space-y-12">
+        <div class="bg-white rounded-lg shadow p-6 chart-container">
+          <h3 class="text-2xl font-semibold mb-1 text-gray-700">📈 Price Performance</h3>
+           <p class="text-sm text-gray-500 mb-4">Illustrative 1-Year Normalized Growth</p>
+          <div class="relative h-64 md:h-96">
+             <canvas id="pricePerformanceChart"></canvas>
+          </div>
+           <p class="text-xs text-gray-500 mt-3 text-center italic">Note: Chart data is for illustration purposes only.</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 chart-container">
+           <h3 class="text-2xl font-semibold mb-1 text-gray-700">📊 Key Metrics Snapshot</h3>
+           <p class="text-sm text-gray-500 mb-4">Illustrative Comparison</p>
+           <div class="relative h-64 md:h-80">
+            <canvas id="keyMetricsChart"></canvas>
+           </div>
+           <p class="text-xs text-gray-500 mt-3 text-center italic">Note: Mkt Cap in Trillions USD, P/E Ratio, Rev Growth YoY %. Illustrative data.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Detailed Performance & Analysis</h2>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="divide-y divide-dashed divide-gray-200">
+
+            <div class="p-6">
+              <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-gray-700">📅 Annual Returns (%)</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left hidden md:table">
+                  <thead class="bg-gray-50 text-gray-600 border-b border-dashed">
+                    <tr>
+                      <th class="px-6 py-3 font-semibold w-1/3">Year</th>
+                      <th class="px-6 py-3 font-semibold text-center text-stock-aapl w-1/3">AAPL</th>
+                      <th class="px-6 py-3 font-semibold text-center text-stock-amzn w-1/3">AMZN</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-dashed divide-gray-200">
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">2023</td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+48%</span></td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+81%</span></td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">2022</td>
+                       <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-27%</span></td>
+                       <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-50%</span></td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">2021</td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+34%</span></td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+2%</span></td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">2020</td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+81%</span></td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+76%</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="md:hidden space-y-4">
+                  <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Year: 2023</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-green-700 font-semibold">+48%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-green-700 font-semibold">+81%</span></p>
+                  </div>
+                  <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Year: 2022</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-red-700 font-semibold">-27%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-red-700 font-semibold">-50%</span></p>
+                  </div>
+                  <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Year: 2021</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-green-700 font-semibold">+34%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-green-700 font-semibold">+2%</span></p>
+                  </div>
+                   <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Year: 2020</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-green-700 font-semibold">+81%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-green-700 font-semibold">+76%</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-gray-700">📅 Recent Monthly Returns (%)</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left hidden md:table">
+                   <thead class="bg-gray-50 text-gray-600 border-b border-dashed">
+                    <tr>
+                      <th class="px-6 py-3 font-semibold w-1/3">Month</th>
+                      <th class="px-6 py-3 font-semibold text-center text-stock-aapl w-1/3">AAPL</th>
+                      <th class="px-6 py-3 font-semibold text-center text-stock-amzn w-1/3">AMZN</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-dashed divide-gray-200">
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">Apr 2024</td>
+                       <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-0.5%</span></td>
+                       <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-2.6%</span></td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">Mar 2024</td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-0.7%</span></td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+2.1%</span></td>
+                    </tr>
+                     <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">Feb 2024</td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-1.0%</span></td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+1.4%</span></td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">Jan 2024</td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-red-800 bg-red-100 font-medium">-4.2%</span></td>
+                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-green-800 bg-green-100 font-medium">+2.6%</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="md:hidden space-y-4">
+                   <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Month: Apr 2024</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-red-700 font-semibold">-0.5%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-red-700 font-semibold">-2.6%</span></p>
+                  </div>
+                   <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Month: Mar 2024</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-red-700 font-semibold">-0.7%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-green-700 font-semibold">+2.1%</span></p>
+                  </div>
+                  <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Month: Feb 2024</p>
+                     <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-red-700 font-semibold">-1.0%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-green-700 font-semibold">+1.4%</span></p>
+                  </div>
+                  <div class="bg-gray-50 p-4 border border-dashed rounded">
+                    <p class="font-semibold text-gray-700">Month: Jan 2024</p>
+                    <p><span class="text-stock-aapl font-medium">AAPL:</span> <span class="text-red-700 font-semibold">-4.2%</span></p>
+                    <p><span class="text-stock-amzn font-medium">AMZN:</span> <span class="text-green-700 font-semibold">+2.6%</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-gray-700">⭐ Pros & Cons Summary</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left min-w-full hidden md:table">
+                   <thead class="bg-gray-50 text-gray-600 border-b border-dashed">
+                      <tr>
+                          <th class="px-6 py-3 w-1/5"></th>
+                          <th class="px-6 py-3 w-2/5 font-semibold text-center text-stock-aapl">AAPL</th>
+                          <th class="px-6 py-3 w-2/5 font-semibold text-center text-stock-amzn">AMZN</th>
+                      </tr>
+                   </thead>
+                  <tbody class="divide-y divide-dashed divide-gray-200">
+                    <tr>
+                      <td class="px-6 py-4 bg-green-50 text-green-700 font-semibold text-center align-top">Pros ✅</td>
+                      <td class="px-6 py-4 text-gray-700 leading-snug">
+                        <ul class="list-disc list-outside space-y-1.5 pl-4">
+                          <li>Exceptional brand loyalty & vast ecosystem</li>
+                          <li>Strong, consistent profitability & cash flow</li>
+                          <li>Shareholder friendly (dividends & buybacks)</li>
+                          <li>Growing high-margin Services segment</li>
+                        </ul>
+                      </td>
+                      <td class="px-6 py-4 text-gray-700 leading-snug">
+                        <ul class="list-disc list-outside space-y-1.5 pl-4">
+                          <li>Leader in E-commerce and Cloud (AWS)</li>
+                          <li>Significant revenue growth potential</li>
+                          <li>Diversifying into advertising, health, etc.</li>
+                          <li>Impressive logistics & fulfillment network</li>
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 bg-red-50 text-red-700 font-semibold text-center align-top">Cons ❌</td>
+                      <td class="px-6 py-4 text-gray-700 leading-snug">
+                        <ul class="list-disc list-outside space-y-1.5 pl-4">
+                          <li>Mature smartphone market growth</li>
+                          <li>Heavy reliance on iPhone success</li>
+                          <li>Increasing regulatory scrutiny (App Store)</li>
+                          <li>Often trades at a premium valuation</li>
+                        </ul>
+                      </td>
+                      <td class="px-6 py-4 text-gray-700 leading-snug">
+                        <ul class="list-disc list-outside space-y-1.5 pl-4">
+                          <li>Historically lower overall profit margins</li>
+                          <li>Faces intense competition across segments</li>
+                          <li>Requires large ongoing capital investment</li>
+                          <li>Subject to significant antitrust concerns</li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                 <div class="md:hidden space-y-6">
+                     <div class="bg-gray-50 p-4 border border-dashed rounded">
+                         <h4 class="text-lg font-semibold text-stock-aapl mb-3 border-b border-stock-aapl/30 pb-2">AAPL Summary</h4>
+                         <div class="mb-3">
+                             <p class="font-medium text-green-700 mb-1">Pros ✅</p>
+                              <ul class="list-disc list-outside space-y-1 text-gray-600 text-sm pl-4">
+                                 <li>Exceptional brand loyalty & vast ecosystem</li>
+                                 <li>Strong, consistent profitability & cash flow</li>
+                                 <li>Shareholder friendly (dividends & buybacks)</li>
+                                 <li>Growing high-margin Services segment</li>
+                             </ul>
+                         </div>
+                         <div>
+                              <p class="font-medium text-red-700 mb-1">Cons ❌</p>
+                             <ul class="list-disc list-outside space-y-1 text-gray-600 text-sm pl-4">
+                                  <li>Mature smartphone market growth</li>
+                                  <li>Heavy reliance on iPhone success</li>
+                                  <li>Increasing regulatory scrutiny (App Store)</li>
+                                  <li>Often trades at a premium valuation</li>
+                             </ul>
+                         </div>
+                     </div>
+                      <div class="bg-gray-50 p-4 border border-dashed rounded">
+                         <h4 class="text-lg font-semibold text-stock-amzn mb-3 border-b border-stock-amzn/30 pb-2">AMZN Summary</h4>
+                         <div class="mb-3">
+                             <p class="font-medium text-green-700 mb-1">Pros ✅</p>
+                              <ul class="list-disc list-outside space-y-1 text-gray-600 text-sm pl-4">
+                                 <li>Leader in E-commerce and Cloud (AWS)</li>
+                                 <li>Significant revenue growth potential</li>
+                                 <li>Diversifying into advertising, health, etc.</li>
+                                 <li>Impressive logistics & fulfillment network</li>
+                             </ul>
+                         </div>
+                         <div>
+                              <p class="font-medium text-red-700 mb-1">Cons ❌</p>
+                             <ul class="list-disc list-outside space-y-1 text-gray-600 text-sm pl-4">
+                                  <li>Historically lower overall profit margins</li>
+                                  <li>Faces intense competition across segments</li>
+                                  <li>Requires large ongoing capital investment</li>
+                                  <li>Subject to significant antitrust concerns</li>
+                             </ul>
+                         </div>
+                     </div>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-16 px-4 sm:px-6 lg:px-8 mt-16">
+      <div class="container mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12 border-b border-gray-700 pb-8">
+          <div class="flex justify-center md:justify-start">
+            <a alt="Home page" href="#" class="inline-block transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <span class="ml-2 text-xl font-bold text-gray-100">Pearler</span>
+            </a>
+          </div>
+
+          <div class="flex flex-col items-center md:items-end">
+            <p class="uppercase text-sm font-semibold tracking-wider text-purple-400 mb-3">Connect With Us</p>
+            <div class="flex space-x-5">
+              <a target="_blank" rel="noopener noreferrer" aria-label="Facebook" href="#" class="text-gray-400 hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-125">
+                <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current" role="img"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"></path></svg>
+              </a>
+              <a target="_blank" rel="noopener noreferrer" aria-label="Instagram" href="#" class="text-gray-400 hover:text-pink-500 transition duration-300 ease-in-out transform hover:scale-125">
+                <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current" role="img"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"></path></svg>
+              </a>
+              <a target="_blank" rel="noopener noreferrer" aria-label="Twitter" href="#" class="text-gray-400 hover:text-sky-400 transition duration-300 ease-in-out transform hover:scale-125">
+                <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current" role="img"><path d="M22.46,6C21.69,6.35 20.86,6.58 20,6.69C20.88,6.16 21.56,5.32 21.88,4.31C21.05,4.81 20.13,5.16 19.16,5.36C18.37,4.5 17.26,4 16,4C13.65,4 11.73,5.92 11.73,8.29C11.73,8.63 11.77,8.96 11.84,9.27C8.28,9.09 5.11,7.38 3,4.79C2.63,5.42 2.42,6.16 2.42,6.94C2.42,8.43 3.17,9.75 4.33,10.5C3.62,10.5 2.96,10.3 2.38,10C2.38,10 2.38,10 2.38,10.03C2.38,12.11 3.86,13.85 5.82,14.24C5.46,14.34 5.08,14.39 4.69,14.39C4.42,14.39 4.15,14.36 3.89,14.31C4.43,16 6,17.26 7.89,17.29C6.43,18.45 4.58,19.13 2.56,19.13C2.22,19.13 1.88,19.11 1.54,19.07C3.44,20.29 5.7,21 8.12,21C16,21 20.33,14.46 20.33,8.79C20.33,8.6 20.33,8.42 20.32,8.23C21.16,7.63 21.88,6.87 22.46,6Z"></path></svg>
+              </a>
+              <a target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" href="#" class="text-gray-400 hover:text-blue-600 transition duration-300 ease-in-out transform hover:scale-125">
+                <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current" role="img"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17A1.4 1.4 0 0 1 15.71 13.57V18.5H18.5M6.88 8.56A1.68 1.68 0 0 0 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19A1.69 1.69 0 0 0 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56M8.27 18.5V10.13H5.5V18.5H8.27Z"></path></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12 text-sm">
+          <div>
+            <p class="uppercase font-bold text-purple-400 tracking-wider mb-4">Products</p>
+            <ul class="space-y-3">
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Investing</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">US Shares</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Microinvesting</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">For Kids</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Retirement</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Home Savings</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="uppercase font-bold text-purple-400 tracking-wider mb-4">Education</p>
+            <ul class="space-y-3">
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Read Blog</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Listen Podcast</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Community</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="uppercase font-bold text-purple-400 tracking-wider mb-4">Rewards</p>
+            <ul class="space-y-3">
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Refer a Friend</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Awards</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Giveaways</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="uppercase font-bold text-purple-400 tracking-wider mb-4">Company</p>
+            <ul class="space-y-3">
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Home</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">About Us</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Pricing</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Help Center</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Contact Us</a></li>
+              <li><a href="#" class="hover:text-white hover:underline transition duration-200">Feature Requests</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="text-xs text-gray-500 space-y-4 border-t border-gray-700 pt-8 mb-8">
+          <p>We acknowledge and pay respect to the past, present and future Traditional Custodians and Elders of this nation.</p>
+          <p>All information provided on this website is general information only and does not constitute personal financial advice. Pearler does not take into account your personal circumstances, financial objectives or needs. Before making any investment decision, you should consider your own circumstances or seek advice from a financial professional. Any illustrative data, including charts and performance figures, is hypothetical and may not reflect actual results.</p>
+          <p>All investments carry risk, including the potential loss of principal. Past performance is not a reliable indicator of future results. Please review our Financial Services Guide (FSG) and the relevant Product Disclosure Statement (PDS) or offer document before investing. Review our <a href="#" class="text-purple-400 hover:text-white underline transition duration-200">Terms of Service</a> before using the platform.</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 border-t border-gray-700 pt-8">
+          <p class="mb-4 md:mb-0 order-2 md:order-1">© Pearler Financial Services Pty Ltd 2024</p>
+          <div class="flex flex-wrap justify-center space-x-4 mb-4 md:mb-0 order-1 md:order-2">
+            <a href="#" class="hover:text-white hover:underline transition duration-200">Terms & Conditions</a>
+            <a href="#" class="hover:text-white hover:underline transition duration-200">Privacy Policy</a>
+            <a href="#" class="hover:text-white hover:underline transition duration-200">Disclaimers</a>
+            <a href="#" class="hover:text-white hover:underline transition duration-200">Security</a>
+            <a href="#" class="hover:text-white hover:underline transition duration-200">FSG</a>
+          </div>
+          <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="flex items-center hover:text-white transition duration-200 order-3 mt-4 md:mt-0" aria-label="Back to top">
+            <span class="mr-1 font-semibold">Back to top</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      mobileMenuButton.addEventListener('click', () => {
+        const isExpanded = mobileMenu.classList.toggle('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const tailwindConfig = window.tailwind.config.theme.extend.colors;
+        const aaplColor = tailwindConfig['stock-aapl'] || '#A855F7';
+        const amznColor = tailwindConfig['stock-amzn'] || '#EC4899';
+        const gridColor = '#E5E7EB'; // gray-200
+
+        const priceCtx = document.getElementById('pricePerformanceChart')?.getContext('2d');
+        if (priceCtx) {
+          const priceLabels = ['May \'23', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan \'24', 'Feb', 'Mar', 'Apr'];
+          const aaplPriceData = [100, 105, 110, 108, 115, 112, 120, 125, 122, 130, 128, 135];
+          const amznPriceData = [100, 110, 115, 120, 118, 125, 135, 145, 150, 155, 152, 160];
+
+          new Chart(priceCtx, {
+            type: 'line',
+            data: {
+              labels: priceLabels,
+              datasets: [
+                {
+                  label: 'AAPL',
+                  data: aaplPriceData,
+                  borderColor: aaplColor,
+                  backgroundColor: aaplColor + '1A',
+                  tension: 0.1,
+                  fill: false,
+                  pointRadius: 2,
+                  pointHoverRadius: 5,
+                  pointBackgroundColor: aaplColor,
+                  borderWidth: 2,
+                },
+                {
+                  label: 'AMZN',
+                  data: amznPriceData,
+                  borderColor: amznColor,
+                  backgroundColor: amznColor + '1A',
+                  tension: 0.1,
+                  fill: false,
+                   pointRadius: 2,
+                   pointHoverRadius: 5,
+                   pointBackgroundColor: amznColor,
+                   borderWidth: 2,
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: false,
+                  title: { display: true, text: 'Normalized Price (Base 100)' },
+                   grid: { color: gridColor, borderDash: [2, 3] },
+                   ticks: { color: '#6B7280'} // gray-500
+                },
+                 x: {
+                   grid: { display: false },
+                   ticks: { color: '#6B7280'} // gray-500
+                 }
+              },
+              plugins: {
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+                  backgroundColor: '#1F2937', // gray-800
+                  titleColor: '#F9FAFB', // gray-50
+                  bodyColor: '#F9FAFB',
+                  borderColor: '#4B5563', // gray-600
+                  borderWidth: 1,
+                  padding: 10,
+                  cornerRadius: 4,
+                  displayColors: true,
+                   boxPadding: 4
+                },
+                legend: {
+                   position: 'top',
+                   align: 'end',
+                   labels: {
+                       usePointStyle: true,
+                       boxWidth: 8,
+                       padding: 20,
+                       color: '#374151' // gray-700
+                   }
+                }
+              },
+               interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+              }
+            }
+          });
+        }
+
+        const metricsCtx = document.getElementById('keyMetricsChart')?.getContext('2d');
+        if (metricsCtx) {
+           const metricsLabels = ['Market Cap ($T)', 'P/E Ratio', 'Revenue Growth (%)'];
+           const aaplMetricsData = [2.8, 29, 5];
+           const amznMetricsData = [1.8, 55, 12];
+
+           new Chart(metricsCtx, {
+               type: 'bar',
+               data: {
+                   labels: metricsLabels,
+                   datasets: [
+                       {
+                           label: 'AAPL',
+                           data: aaplMetricsData,
+                           backgroundColor: aaplColor + 'D9', // Slightly less transparent
+                           borderColor: aaplColor,
+                           borderWidth: 1,
+                           borderRadius: 4,
+                           borderSkipped: false,
+                       },
+                       {
+                           label: 'AMZN',
+                           data: amznMetricsData,
+                           backgroundColor: amznColor + 'D9',
+                           borderColor: amznColor,
+                           borderWidth: 1,
+                           borderRadius: 4,
+                           borderSkipped: false,
+                       }
+                   ]
+               },
+               options: {
+                   responsive: true,
+                   maintainAspectRatio: false,
+                   indexAxis: 'y',
+                   scales: {
+                       x: {
+                           beginAtZero: true,
+                           title: { display: true, text: 'Value' },
+                           grid: { color: gridColor, borderDash: [2, 3] },
+                           ticks: { color: '#6B7280'}
+                       },
+                       y: {
+                           grid: { display: false },
+                            ticks: { color: '#374151'} // gray-700
+                       }
+                   },
+                   plugins: {
+                       legend: {
+                          position: 'top',
+                          align: 'end',
+                          labels: {
+                              usePointStyle: true,
+                              boxWidth: 8,
+                              padding: 20,
+                              color: '#374151'
+                           }
+                       },
+                       tooltip: {
+                           backgroundColor: '#1F2937',
+                           titleColor: '#F9FAFB',
+                           bodyColor: '#F9FAFB',
+                           borderColor: '#4B5563',
+                           borderWidth: 1,
+                           padding: 10,
+                           cornerRadius: 4,
+                           displayColors: false,
+                           callbacks: {
+                               label: function(context) {
+                                   let label = context.dataset.label || '';
+                                   if (label) { label += ': '; }
+                                   if (context.parsed.x !== null) { label += context.parsed.x; }
+                                   return label;
+                               }
+                           }
+                       }
+                   },
+                   elements: {
+                       bar: {
+                           barPercentage: 0.7,
+                           categoryPercentage: 0.6
+                       }
+                   }
+               }
+           });
+        }
+      });
+    </script>
+
+  </body>
+</html>
