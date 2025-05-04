@@ -1,6 +1,6 @@
 # Responsive Stock Comparison Page
 
-![Project Screenshot](placeholder-screenshot.png) <!-- Optional: Replace with an actual screenshot URL or path -->
+![Project Screenshot](https://github.com/user-attachments/assets/62057535-a16e-4d56-aa8e-37b228222424)
 
 A responsive web page designed to visually compare key metrics, performance data, and qualitative information for two stocks (using Apple (AAPL) and Amazon (AMZN) as examples). Built with modern frontend technologies focusing on clean UI, data visualization, and responsiveness.
 
